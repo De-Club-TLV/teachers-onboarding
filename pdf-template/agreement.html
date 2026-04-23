@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>De Club · Teachers Agreement · {{full_name}}</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600&family=Allura&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #000000;
+    color: #f5f0e8;
+    font-family: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 300;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    letter-spacing: 0;
+  }
+  body {
+    padding: 0;
+    margin: 0;
+    background-color: #000000;
+  }
+  .sheet {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 22mm 26mm 26mm;
+    background-color: #000000;
+    background-image:
+      radial-gradient(ellipse 90% 40% at 50% -8%, rgba(209, 220, 189, 0.05), transparent 65%),
+      radial-gradient(ellipse 70% 30% at 50% 108%, rgba(209, 220, 189, 0.03), transparent 65%);
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .sheet:last-child { page-break-after: auto; }
+  .clause, .appendix, .signature-card, .preamble {
+    page-break-inside: avoid;
+  }
+
+  /* ============ HEADER ============ */
+  .masthead {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: end;
+    gap: 24px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .masthead::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(209,220,189,0.5) 15%, rgba(209,220,189,0.5) 85%, transparent 100%);
+  }
+  .masthead-logo { height: 22px; display: block; }
+  .masthead-meta {
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .masthead-meta .m-eye {
+    font-size: 0.52rem;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: #D1DCBD;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .masthead-meta .m-sub {
+    font-size: 0.52rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8f8b7e;
+  }
+
+  /* ============ TITLE BAND ============ */
+  .title-band {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 10px;
+  }
+  .title-band-english {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.54rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #b0aba3;
+  }
+  .title-band-hebrew {
+    direction: rtl;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.54rem;
+    letter-spacing: 0.14em;
+    color: #b0aba3;
+  }
+  .title-band-mark {
+    width: 5px; height: 5px;
+    background: #D1DCBD;
+    transform: rotate(45deg);
+  }
+
+  /* ============ PREAMBLE ============ */
+  .preamble {
+    direction: rtl;
+    text-align: right;
+    font-size: 0.62rem;
+    line-height: 1.55;
+    color: #f5f0e8;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed rgba(245,240,232,0.1);
+  }
+  .preamble-title {
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: #D1DCBD;
+    margin-bottom: 5px;
+    letter-spacing: 0.02em;
+  }
+  .preamble .signer {
+    display: inline-block;
+    padding: 0 8px;
+    margin: 0 2px;
+    color: #f5f0e8;
+    font-weight: 500;
+    background: linear-gradient(to bottom, transparent 75%, rgba(209,220,189,0.25) 75%, rgba(209,220,189,0.25) 95%, transparent 95%);
+  }
+  .preamble strong { color: #f5f0e8; font-weight: 500; }
+  .preamble .therefore {
+    font-weight: 500;
+    color: #D1DCBD;
+    font-size: 0.72rem;
+    margin-top: 6px;
+    letter-spacing: 0.01em;
+  }
+
+  /* ============ CLAUSES ============ */
+  .clauses {
+    direction: rtl;
+    text-align: right;
+    font-size: 0.58rem;
+    line-height: 1.5;
+    color: #f5f0e8;
+  }
+  .clause {
+    padding: 4px 0 3px;
+    position: relative;
+  }
+  .clause + .clause {
+    border-top: 1px solid rgba(209,220,189,0.05);
+  }
+  .clause-head {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    margin-bottom: 2px;
+    /* Parent is RTL. Default flex flows items right-to-left by DOM order. */
+  }
+  .clause-tick {
+    width: 3px;
+    height: 11px;
+    background: #D1DCBD;
+    flex-shrink: 0;
+    transform: translateY(2px);
+  }
+  .clause-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #D1DCBD;
+    direction: ltr;
+    unicode-bidi: isolate;
+    white-space: nowrap;
+  }
+  .clause-title {
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #f5f0e8;
+    letter-spacing: 0;
+  }
+  .clause-body {
+    text-align: right;
+    color: #d8d3c9;
+    padding-right: 12px;
+  }
+  .clause-body .sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.56rem;
+    font-weight: 400;
+    color: #D1DCBD;
+    margin-left: 5px;
+    letter-spacing: 0;
+    opacity: 0.9;
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-block;
+  }
+  .clauses strong { color: #f5f0e8; font-weight: 500; }
+
+  /* ============ APPENDICES ============ */
+  .appendices {
+    direction: rtl;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(245,240,232,0.1);
+  }
+  .appendix { margin-bottom: 8px; }
+  .appendix + .appendix { margin-top: 6px; }
+  .appendix-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+    /* Parent is RTL. Flex items flow right-to-left by DOM order. */
+  }
+  .appendix-title {
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #f5f0e8;
+  }
+  .appendix-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #D1DCBD;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+  .appendix-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to left, rgba(209,220,189,0.6), transparent);
+  }
+  .appendix ul {
+    list-style: none;
+    direction: rtl;
+    font-size: 0.6rem;
+    color: #d8d3c9;
+    padding-right: 14px;
+  }
+  .appendix li {
+    position: relative;
+    padding-right: 12px;
+    line-height: 1.5;
+    margin-bottom: 1px;
+  }
+  .appendix li::before {
+    content: "•";
+    position: absolute;
+    right: 0;
+    color: #D1DCBD;
+    opacity: 0.7;
+  }
+  .appendix li strong { color: #f5f0e8; font-weight: 500; }
+  .appendix-note {
+    direction: rtl;
+    text-align: right;
+    font-size: 0.56rem;
+    color: #b0aba3;
+    margin-top: 5px;
+    padding-right: 14px;
+    line-height: 1.5;
+  }
+
+  /* ============ SIGNATURE CARD ============ */
+  .signature-card {
+    position: relative;
+    direction: ltr;
+    text-align: left;
+    margin-top: 12px;
+    padding: 14px 18px 12px;
+    page-break-inside: avoid;
+  }
+  .signature-card::before,
+  .signature-card::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid #D1DCBD;
+  }
+  .signature-card::before {
+    top: 0; left: 0;
+    border-right: none;
+    border-bottom: none;
+  }
+  .signature-card::after {
+    bottom: 0; right: 0;
+    border-left: none;
+    border-top: none;
+  }
+  .signature-card .corner-tr,
+  .signature-card .corner-bl {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid #D1DCBD;
+  }
+  .signature-card .corner-tr {
+    top: 0; right: 0;
+    border-left: none;
+    border-bottom: none;
+  }
+  .signature-card .corner-bl {
+    bottom: 0; left: 0;
+    border-right: none;
+    border-top: none;
+  }
+
+  .sig-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: #D1DCBD;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sig-eyebrow::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgba(209,220,189,0.35), transparent);
+  }
+
+  .sig-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 26px;
+    align-items: stretch;
+  }
+
+  .sig-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px dashed rgba(209,220,189,0.2);
+    padding-right: 26px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .sig-left .key {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.46rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8f8b7e;
+    margin-bottom: 4px;
+  }
+  .sig-image-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 2px 0 4px;
+    min-height: 30mm;
+  }
+  .sig-image {
+    max-height: 28mm;
+    max-width: 90%;
+    height: auto;
+    display: block;
+  }
+  .sig-underline {
+    height: 1px;
+    background: linear-gradient(to right, #D1DCBD 0%, rgba(209,220,189,0.2) 100%);
+    width: 80%;
+    margin-top: 6px;
+  }
+
+  .sig-right {
+    display: grid;
+    grid-template-rows: auto auto auto;
+    gap: 6px;
+    align-content: center;
+  }
+  .spec-row {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 10px;
+    align-items: baseline;
+    padding: 3px 0;
+  }
+  .spec-row + .spec-row {
+    border-top: 1px solid rgba(245,240,232,0.08);
+  }
+  .spec-key {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.46rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8f8b7e;
+  }
+  .spec-val {
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.68rem;
+    color: #f5f0e8;
+    font-weight: 400;
+  }
+  .spec-val.mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.04em;
+  }
+
+  .sig-confirm {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(209,220,189,0.15);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.55rem;
+    line-height: 1.5;
+    color: #b0aba3;
+  }
+  .sig-seal {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #D1DCBD;
+    color: #D1DCBD;
+    font-size: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+  .sig-confirm strong { color: #D1DCBD; font-weight: 500; }
+
+  /* ============ FOOTER ============ */
+  .pageside-footer {
+    position: fixed;
+    bottom: 6mm;
+    left: 20mm;
+    right: 20mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.46rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #8f8b7e;
+  }
+  .pageside-footer .dot {
+    width: 3px; height: 3px;
+    background: #D1DCBD;
+    transform: rotate(45deg);
+  }
+
+  /* utility */
+  .sp { letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+
+  <!-- ================= SHEET 1 ================= -->
+  <div class="sheet">
+
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <img src="logo.svg" class="masthead-logo" alt="De Club">
+    <div class="masthead-meta">
+      <span class="m-eye">Teachers Agreement · Signed Copy</span>
+      <span class="m-sub">{{full_name}} · {{signed_at}}</span>
+    </div>
+  </header>
+
+  <!-- ============ TITLE BAND ============ -->
+  <div class="title-band">
+    <span class="title-band-english">De Club · Tel Aviv</span>
+    <span class="title-band-mark"></span>
+    <span class="title-band-hebrew">הסכם מורים · VUCA / ART</span>
+  </div>
+
+  <!-- ============ PREAMBLE ============ -->
+  <section class="preamble" lang="he" dir="rtl">
+    <h1 class="preamble-title">הסכם זה נערך ונחתם בין:</h1>
+    <p>
+      דה קלאב טי אל וי בע״מ, ח.פ 517117107 (להלן: <strong>"החברה"</strong>)<br>
+      לבין <span class="signer">{{full_name}}</span>, ת.ז <span class="signer">{{id_number}}</span> (להלן: <strong>"הקבלן"</strong>).
+    </p>
+    <p style="margin-top:4px;">
+      <strong>הואיל</strong> והחברה עוסקת בהפעלת מתחם כושר וולנס; <strong>והואיל</strong> והחברה מבקשת לקבל מהקבלן שירותי הדרכת אימונים כמפורט בנספח א׳; <strong>והואיל</strong> והחברה הסכימה להתקשרות על בסיס קבלני; <strong>והואיל</strong> וברצון הצדדים להעלות על הכתב את ההסכמות ביניהם;
+    </p>
+    <p class="therefore">לפיכך הוסכם, הותנה והוצהר בין הצדדים כדלקמן:</p>
+  </section>
+
+  <!-- ============ CLAUSES ============ -->
+  <section class="clauses" lang="he" dir="rtl">
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">01</span>
+        <span class="clause-title">מבוא ונספחים</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">1.1</span> המבוא והנספחים להסכם זה מהווים חלק בלתי נפרד ממנו ויפורשו יחד עמו.<br>
+        <span class="sub">1.2</span> כותרות הסעיפים משמשות לנוחות הקריאה בלבד ולא לפרשנות ההסכם.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">02</span>
+        <span class="clause-title">השירותים</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">2.1</span> במהלך תקופת ההתקשרות יעניק הקבלן לחברה את השירותים המפורטים בנספח א׳, בהתאם ללוחות הזמנים וההיקפים המפורטים בו.<br>
+        <span class="sub">2.2</span> מעמדו של הקבלן לפי הסכם זה כלפי החברה וכלפי צד שלישי יהיה כ״קבלן עצמאי״.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">03</span>
+        <span class="clause-title">הצהרות והתחייבות הצדדים</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">3.1</span> הצדדים מצהירים כי אין להם כל מניעה, על פי כל דין או הסכם, להתקשר בהסכם זה.<br>
+        <span class="sub">3.2</span> הקבלן מצהיר כי הוא בעל הידע, הכישורים, ההכשרה, הניסיון והאמצעים הנדרשים לביצוע התחייבויותיו ברמה ובטיב מעולים.<br>
+        <span class="sub">3.3</span> הקבלן מצהיר כי בידו כל הרישיונות וההיתרים הנדרשים לביצוע השירותים, וכי הוא בעל הסמכה בהתאם להוראות הדין בתחום אימון הכושר.<br>
+        <span class="sub">3.4</span> המדריך מצהיר כי בידיו תעודות רלוונטיות, לרבות תעודת מגיש עזרה ראשונה בתוקף וקורס הכשרה ייעודי.<br>
+        <span class="sub">3.5</span> הקבלן יהיה ישר ונאמן עם החברה וישתף פעולה באופן מלא עם כל צוות העובדים.<br>
+        <span class="sub">3.6</span> הקבלן יפעל בהתאם להנחיות ניר אליאור ו/או כפיר גולדצקי ו/או יובל כץ ו/או מי מטעמם.<br>
+        <span class="sub">3.7</span> הקבלן מצהיר כי אינו מוסמך להתחייב בשם החברה אלא בהתאם להסכם זה או בהסכמת החברה בכתב ומראש.<br>
+        <span class="sub">3.8</span> הקבלן מתחייב לפעול ולמלא אחר הנחיות החברה ולבצע את השירותים במירב הקפדנות, הידע המקצועי והיעילות, לשביעות רצונה המלא.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">04</span>
+        <span class="clause-title">אופן ביצוע השירותים</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">4.1</span> הקבלן מתחייב למלא את תפקידו ולהעניק את השירותים בנאמנות, במיומנות וכמיטב ניסיונו והידע המקצועי שלו, הן כלפי החברה והן כלפי כל מי שיבוא עמו במגע.<br>
+        <span class="sub">4.2</span> הקבלן יהיה אחראי לטיב השירותים שיינתנו על ידו.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">05</span>
+        <span class="clause-title">התמורה</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">5.1</span> כפוף למילוי התחייבויותיו של הקבלן במלואן ובמועדן, תשלם החברה לקבלן את התמורה המפורטת בנספח ב׳.<br>
+        <span class="sub">5.2</span> ידוע לקבלן כי עליו להגיע כ־15 דקות לפני תחילת כל משמרת לצורך ארגון המשמרת, וכי ייתכנו ישיבות הדורשות השתתפותו ללא תמורה נוספת.<br>
+        <span class="sub">5.3</span> הצדדים מצהירים כי התמורה היא מלאה וסופית וכוללת את מלוא התשלומים להם זכאי הקבלן.<br>
+        <span class="sub">5.4</span> הקבלן מסכים כי כל הוצאותיו, לרבות נסיעה ותחבורה, יחולו עליו בלבד.<br>
+        <span class="sub">5.5</span> התמורה נקבעה לאחר שהקבלן חישב ולקח בחשבון את כל ההוצאות הכרוכות במתן השירותים.<br>
+        <span class="sub">5.6</span> לתמורה יתווסף מע״מ כדין.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">06</span>
+        <span class="clause-title">אחריות</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">6.1</span> הקבלן יהיה אחראי לכל נזק או הפסד שייגרמו לחברה כתוצאה ממעשה או מחדל שלו או עקב הפרת התחייבויותיו.<br>
+        <span class="sub">6.4</span> הקבלן מתחייב לבטח את השירותים כנדרש בהתאם להוראות הדין, ובכלל זה מתחייב כי בעת מתן השירותים יהיה מבוטח בביטוח אחריות של לפחות מיליון ש״ח.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">07</span>
+        <span class="clause-title">קניין רוחני</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">7.1</span> הקבלן מצהיר כי אין כל מניעה חוזית, חוקית או אחרת למתן השירותים, ואין בהם משום הפרה או פגיעה בזכויות צד שלישי.<br>
+        <span class="sub">7.2</span> זכויות היוצרים בכל תכנון, שירות, עיצוב או מסמך שיבוצעו על ידי הקבלן יהיו של החברה וייחשבו כקניינה המוחלט.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">08</span>
+        <span class="clause-title">מהות היחסים בין הצדדים</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">8.1</span> הקבלן מצהיר כי הוא קבלן עצמאי ואינו משתלב ביחסי עובד־מעסיק כלשהם עם החברה, והסכם זה אינו יוצר יחסים כאלו.<br>
+        <span class="sub">8.2</span> הקבלן מתחייב לשלם בעצמו למוסד לביטוח לאומי את כל דמי הביטוח שהוא חייב בהם על פי חוק הביטוח הלאומי ותשלומים אחרים.<br>
+        <span class="sub">8.3</span> היה וייקבע בבית משפט או בבית דין כי חלים יחסי עובד־מעסיק, הקבלן מאשר כי בשל דרישתו שייקבע מעמדו כקבלן עצמאי, ניתנת לו תמורה גבוהה יותר, והשכר שהיה מגיע לו כעובד היה עומד על 60% מהתמורה הכוללת.<br>
+        <span class="sub">8.4</span> הקבלן מתחייב לשפות את החברה ולהשיב לה כל סכום נוסף או הוצאה עודפת בגין קביעה על יחסי עובד־מעסיק.<br>
+        <span class="sub">8.5</span> סעיף זה הינו סעיף יסודי והפרתו תהווה הפרה יסודית של ההסכם.
+      </div>
+    </article>
+
+    </section>  <!-- close clauses on sheet 1 -->
+  </div>
+
+  <!-- ================= SHEET 2 ================= -->
+  <div class="sheet">
+    <section class="clauses" lang="he" dir="rtl">
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">09</span>
+        <span class="clause-title">סודיות ואי־תחרות</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">9.1</span> הקבלן מתחייב באופן בלתי חוזר, בתקופת ההתקשרות וגם לאחר סיומה, לשמור על סודיות מלאה ומוחלטת בקשר למידע שהגיע אליו מהחברה, ולא להשתמש, לגלות, למסור, לצלם, להקליט, לשכפל, להעתיק או להעביר את המידע, בחלקו או במלואו, לאדם או גורם כלשהו, בתמורה או שלא בתמורה, ללא הסכמת החברה בכתב ומראש.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">10</span>
+        <span class="clause-title">מידע וסודות החברה</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">10.1</span> כל המידע הקשור במישרין או בעקיפין לחברה או לחברות קשורות אליה, לרבות מידע כלכלי, עסקי, פיננסי, מסחרי, סטטיסטי, שיווקי, נתוני שיווק ומכירות, שיטות ותהליכי עבודה, סודות מקצועיים, רשימות לקוחות וספקים, מחקר ופיתוח ותוכניות עסקיות, נחשבים לסודות מסחריים רבי ערך של החברה.<br>
+        <span class="sub">10.2</span> הקבלן מתחייב לנקוט בכל אמצעי הזהירות והצעדים הדרושים לשמירת המידע וסודות החברה ולמניעת העברתם לצד שלישי.<br>
+        <span class="sub">10.3</span> מיד עם דרישת החברה, הקבלן מתחייב להחזיר לה כל מסמך וחומר שיימצא ברשותו או בשליטתו.<br>
+        <span class="sub">10.4</span> התחייבויות הקבלן יחולו עליו ועל כל מי מטעמו, במישרין או בעקיפין, כשכיר, עצמאי, שותף, יועץ, מנהל, בעל מניות או בכל דרך אחרת.<br>
+        <span class="sub">10.7</span> המדריך מתחייב לשמור בסודיות מוחלטת את תנאי העסקתו ושכרו במהלך ההתקשרות ולאחריה.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">11</span>
+        <span class="clause-title">תקופת ההתקשרות וסיום</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">11.1</span> הסכם זה ייכנס לתוקף החל מדצמבר 2025 ויישאר בתוקף עד אשר מי מהצדדים ייתן למשנהו הודעה בכתב של 45 ימים מראש. החברה לא תישא בכל תשלום, קנס או פיצוי במקרה של סיום ההסכם.<br>
+        <span class="sub">11.2</span> הצדדים מסכימים כי במשך כל שנה קלנדרית רשאית החברה להשהות את השירותים למשך תקופות מסוימות, לרבות חגי ישראל ואירועים שונים, בהתאם לשיקול דעתה הבלעדי.<br>
+        <span class="sub">11.3</span> החברה רשאית לסיים הסכם זה באופן מיידי בהודעה בכתב לקבלן במקרים הבאים: הפרת ההסכם שלא תוקנה בתוך 7 ימים מהודעה בכתב; הפרה יסודית של ההסכם; חוסר כשירות של הקבלן לספק את השירותים; או הפרת חובת האמון כלפי החברה.
+      </div>
+    </article>
+
+    <article class="clause">
+      <header class="clause-head">
+        <span class="clause-tick"></span>
+        <span class="clause-num">12</span>
+        <span class="clause-title">כללי</span>
+      </header>
+      <div class="clause-body">
+        <span class="sub">12.1</span> הסכם זה ממצה את כל המוסכם והמותנה בין הצדדים ומחליף כל הבנה, מצג, הסכם או התחייבות קודמים.<br>
+        <span class="sub">12.2</span> לא יהיה כל תוקף לשינוי בהוראות ההסכם אלא אם נעשה בכתב ונחתם על ידי הצדדים.<br>
+        <span class="sub">12.3</span> אם ייקבע על ידי רשות שיפוטית כי הוראה אינה חוקית, תבוצע הפרדה כך שיתר הסעיפים יוותרו ללא שינוי.<br>
+        <span class="sub">12.5</span> על הסכם זה יחולו באופן בלעדי דיני מדינת ישראל.<br>
+        <span class="sub">12.6</span> סמכות השיפוט הבלעדית תהא נתונה לבתי המשפט במחוז תל־אביב יפו.
+      </div>
+    </article>
+
+  </section>
+
+  <!-- ============ APPENDICES ============ -->
+  <section class="appendices" lang="he" dir="rtl">
+    <article class="appendix">
+      <header class="appendix-head">
+        <span class="appendix-title">השירותים</span>
+        <span class="appendix-tag">Appendix A</span>
+        <span class="appendix-rule"></span>
+      </header>
+      <ul>
+        <li>אימוני כושר וולנס.</li>
+        <li>תכני ספורט וכושר להם הקבלן מוסמך.</li>
+        <li>בכל סוגי האימונים, ייתכן והשירותים יוענקו הן כמאמן מתחם והן כמאמן סטודיו.</li>
+        <li>נוכחות בישיבות מזדמנות וקבלת המידע הנדרש לצורך ניהול האימון והמתחם.</li>
+        <li>השתתפות בצילומים ו/או בפעולות ייצוגיות של העסק.</li>
+      </ul>
+    </article>
+
+    <article class="appendix">
+      <header class="appendix-head">
+        <span class="appendix-title">התמורה</span>
+        <span class="appendix-tag">Appendix B</span>
+        <span class="appendix-rule"></span>
+      </header>
+      <ul>
+        <li><strong>200 ש״ח + מע״מ</strong> בעבור העברת אימון בקומות VUCA / ART.</li>
+        <li><strong>150 ש״ח + מע״מ</strong> בעבור שעת הדרכה בקומת LIVO.</li>
+        <li><strong>60 ש״ח + מע״מ</strong> בעבור אירוח תרגול חופשי בקומת LIVO.</li>
+      </ul>
+      <p class="appendix-note">התמורה בגין החודש הקלנדרי שחלף תשולם עד ליום ה־20 בכל חודש. הקבלן ימציא לחברה עד ליום ה־3 בכל חודש חשבונית מס בעבור שירותיו בגין החודש הקלנדרי שחלף.</p>
+    </article>
+  </section>
+
+  <!-- ============ SIGNATURE CARD ============ -->
+  <section class="signature-card">
+    <span class="corner-tr"></span>
+    <span class="corner-bl"></span>
+
+    <div class="sig-eyebrow">In Witness Whereof</div>
+
+    <div class="sig-row">
+      <div class="sig-left">
+        <span class="key">Signed</span>
+        <div class="sig-image-wrap">
+          <img src="{{signature_data_url}}" class="sig-image" alt="{{full_name}}" />
+        </div>
+        <div class="sig-underline"></div>
+      </div>
+      <div class="sig-right">
+        <div class="spec-row">
+          <span class="spec-key">Signatory</span>
+          <span class="spec-val">{{full_name}}</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">ID · ת.ז</span>
+          <span class="spec-val mono">{{id_number}}</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">Signed At</span>
+          <span class="spec-val mono">{{signed_at}}</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+
+  </div>
+
+</body>
+</html>
