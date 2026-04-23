@@ -465,7 +465,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     direction: rtl;
     text-align: right;
     scrollbar-width: thin;
-    scrollbar-color: var(--color-border-strong) transparent;
+    scrollbar-color: var(--color-sage) transparent;
 }
 
 .agreement-body::-webkit-scrollbar {
@@ -477,12 +477,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .agreement-body::-webkit-scrollbar-thumb {
-    background: var(--color-border-strong);
+    background: var(--color-sage);
     border-radius: 4px;
 }
 
 .agreement-body::-webkit-scrollbar-thumb:hover {
-    background: var(--color-sage);
+    background: var(--color-green);
 }
 
 .agreement-body:focus {
@@ -540,13 +540,119 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     font-weight: 500;
 }
 
-.signature-input {
-    font-family: 'Figtree', cursive;
-    font-size: 1.35rem !important;
+/* ---------- Inline signer (inside agreement preamble) ---------- */
+
+.inline-signer {
+    display: inline-block;
+    padding: 0 6px;
+    border-bottom: 1px solid var(--color-sage);
+    color: var(--color-cream);
+    font-weight: 500;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.inline-signer.is-placeholder {
+    color: var(--color-text-muted);
     font-style: italic;
-    font-weight: 400 !important;
-    letter-spacing: 0.01em;
-    color: var(--color-sage) !important;
+    font-weight: 400;
+    border-bottom-style: dashed;
+    border-bottom-color: var(--color-border-strong);
+}
+
+/* ---------- Signature pad ---------- */
+
+.signature-pad-wrap {
+    position: relative;
+    background: var(--color-field-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    aspect-ratio: 5 / 2;
+    overflow: hidden;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.signature-pad-wrap:hover {
+    border-color: var(--color-border-strong);
+}
+
+.signature-pad-wrap.is-signed {
+    border-color: var(--color-sage);
+    background: rgba(209, 220, 189, 0.04);
+}
+
+.signature-pad-wrap.is-signed:focus-within,
+.signature-pad-wrap:focus-within {
+    border-color: var(--color-sage);
+    box-shadow: 0 0 0 3px rgba(209, 220, 189, 0.12);
+}
+
+.signature-pad {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.signature-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    pointer-events: none;
+    opacity: 0.65;
+    transition: opacity 0.2s ease;
+}
+
+.signature-pad-wrap.is-signed .signature-placeholder {
+    opacity: 0;
+}
+
+.signature-clear {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        opacity 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.signature-pad-wrap.is-signed .signature-clear {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.signature-clear:hover {
+    color: var(--color-cream);
+    border-color: var(--color-sage);
+}
+
+.field.invalid .signature-pad-wrap {
+    border-color: rgba(232, 165, 153, 0.55);
 }
 
 .checkbox-row {

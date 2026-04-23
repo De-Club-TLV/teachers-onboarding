@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teachers Onboarding — De Club</title>
+    <title>Teachers Onboarding · De Club</title>
     <link rel="shortcut icon" href="assets/favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,6 @@
             <div class="form-intro">
                 <span class="eyebrow">Teachers Onboarding</span>
                 <h1 class="title">Welcome to De Club</h1>
-                <p class="subtitle">Let's get you set up. Share your details, upload your documents, and sign the agreement.</p>
             </div>
 
             <form
@@ -35,14 +34,15 @@
             >
                 <input type="hidden" name="form-name" value="teachers-onboarding">
                 <input type="hidden" name="phone_country" value="">
+                <input type="hidden" name="signature_image" id="signature-image" value="">
                 <p class="honeypot" aria-hidden="true">
                     <label>Don't fill this out: <input name="bot-field"></label>
                 </p>
 
-                <!-- ============ SECTION 1 — Personal Details ============ -->
+                <!-- ============ SECTION 1 · Personal Details ============ -->
                 <div class="section-header">
-                    <span class="section-eyebrow">01 — Personal</span>
-                    <h2 class="section-title">Who you are</h2>
+                    <span class="section-eyebrow">01 · Personal</span>
+                    <h2 class="section-title">Who You Are</h2>
                 </div>
 
                 <div class="field-row">
@@ -99,10 +99,10 @@
                     </div>
                 </div>
 
-                <!-- ============ SECTION 2 — Files ============ -->
+                <!-- ============ SECTION 2 · Files ============ -->
                 <div class="section-header">
-                    <span class="section-eyebrow">02 — Documents</span>
-                    <h2 class="section-title">Your files</h2>
+                    <span class="section-eyebrow">02 · Documents</span>
+                    <h2 class="section-title">Your Files</h2>
                 </div>
 
                 <div class="field">
@@ -116,7 +116,7 @@
                         <span class="file-cta">Click to upload</span>
                         <span class="file-meta">JPG or PNG · up to 10 MB</span>
                         <span class="file-name" data-placeholder="No file chosen">No file chosen</span>
-                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required hidden>
+                        <input type="file" id="profile_picture" name="profile_picture" accept="image/jpeg,image/png" required hidden>
                     </label>
                 </div>
 
@@ -128,16 +128,16 @@
                             <path d="M14 3V8H19" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                         </svg>
                         <span class="file-cta">Click to upload</span>
-                        <span class="file-meta">PDF or image · multiple files OK</span>
+                        <span class="file-meta">PDF, JPG or PNG · multiple files OK</span>
                         <span class="file-name" data-placeholder="No files chosen">No files chosen</span>
-                        <input type="file" id="certifications" name="certifications" accept=".pdf,image/*" multiple required hidden>
+                        <input type="file" id="certifications" name="certifications" accept="application/pdf,image/jpeg,image/png" multiple required hidden>
                     </label>
                 </div>
 
-                <!-- ============ SECTION 3 — Payment ============ -->
+                <!-- ============ SECTION 3 · Bank Account Details ============ -->
                 <div class="section-header">
-                    <span class="section-eyebrow">03 — Payment</span>
-                    <h2 class="section-title">How we pay you</h2>
+                    <span class="section-eyebrow">03 · Payment</span>
+                    <h2 class="section-title">Bank Account Details</h2>
                 </div>
 
                 <div class="field">
@@ -145,11 +145,11 @@
                     <div class="radio-group">
                         <label class="radio-pill">
                             <input type="radio" name="business_type" value="Osek Murshe" required>
-                            <span>עוסק מורשה<small>Authorised dealer</small></span>
+                            <span>עוסק מורשה</span>
                         </label>
                         <label class="radio-pill">
                             <input type="radio" name="business_type" value="Osek Patur" required>
-                            <span>עוסק פטור<small>Exempt dealer</small></span>
+                            <span>עוסק פטור</span>
                         </label>
                     </div>
                 </div>
@@ -157,11 +157,11 @@
                 <div class="field-row field-row-3">
                     <div class="field">
                         <label for="bank_number" class="label">Bank <span class="required">*</span></label>
-                        <input type="text" id="bank_number" name="bank_number" inputmode="numeric" pattern="[0-9]{1,4}" placeholder="e.g. 12" required>
+                        <input type="text" id="bank_number" name="bank_number" inputmode="numeric" pattern="[0-9]{1,3}" maxlength="3" placeholder="e.g. 012" required>
                     </div>
                     <div class="field">
                         <label for="branch_number" class="label">Branch <span class="required">*</span></label>
-                        <input type="text" id="branch_number" name="branch_number" inputmode="numeric" pattern="[0-9]{1,5}" placeholder="e.g. 601" required>
+                        <input type="text" id="branch_number" name="branch_number" inputmode="numeric" pattern="[0-9]{1,3}" maxlength="3" placeholder="e.g. 601" required>
                     </div>
                     <div class="field">
                         <label for="account_number" class="label">Account <span class="required">*</span></label>
@@ -169,29 +169,19 @@
                     </div>
                 </div>
 
-                <!-- ============ SECTION 4 — Notes & Agreement ============ -->
-                <div class="section-header">
-                    <span class="section-eyebrow">04 — Finishing Up</span>
-                    <h2 class="section-title">Agreement &amp; notes</h2>
-                </div>
-
-                <div class="field">
-                    <label for="notes" class="label">Additional Notes <span class="hint">Optional</span></label>
-                    <textarea id="notes" name="notes" rows="4" placeholder="Anything we should know about you, your practice, or your schedule."></textarea>
-                </div>
-
+                <!-- ============ Agreement Card ============ -->
                 <div class="agreement-card">
                     <div class="agreement-head">
-                        <span class="agreement-eyebrow">הסכם מורים — De Club Teachers Agreement</span>
+                        <span class="agreement-eyebrow">הסכם מורים · De Club Teachers Agreement</span>
                         <p class="agreement-instruction">Please read the agreement carefully before signing below.</p>
                     </div>
 
                     <div class="agreement-body" dir="rtl" lang="he" tabindex="0" aria-label="Teachers Agreement">
-                        <p class="agreement-preamble"><strong>הסכם מורים — VUCA / ART</strong><br>אנא קרא/י בעיון את ההסכם.</p>
+                        <p class="agreement-preamble"><strong>הסכם מורים - VUCA / ART</strong><br>אנא קרא/י בעיון את ההסכם.</p>
 
                         <p><strong>הסכם זה נערך ונחתם בין:</strong><br>
                         דה קלאב טי אל וי בע״מ, ח.פ 517117107 (להלן: <strong>"החברה"</strong>)<br>
-                        לבין הקבלן כמפורט בטופס זה (להלן: <strong>"הקבלן"</strong>).</p>
+                        לבין <span class="inline-signer is-placeholder" id="inline-name" data-placeholder="[שם מלא]">[שם מלא]</span>, ת.ז <span class="inline-signer is-placeholder" id="inline-id" data-placeholder="[מספר זהות]">[מספר זהות]</span> (להלן: <strong>"הקבלן"</strong>).</p>
 
                         <p><strong>הואיל</strong> והחברה עוסקת בהפעלת מתחם כושר וולנס; <strong>והואיל</strong> והחברה מבקשת לקבל מהקבלן שירותי הדרכת אימונים כמפורט בנספח א׳; <strong>והואיל</strong> והחברה הסכימה להתקשרות על בסיס קבלני; <strong>והואיל</strong> וברצון הצדדים להעלות על הכתב את ההסכמות ביניהם;</p>
 
@@ -246,11 +236,11 @@
                         <p>9.1 הקבלן מתחייב באופן בלתי חוזר, בתקופת ההתקשרות וגם לאחר סיומה, לשמור על סודיות מלאה ומוחלטת בקשר למידע שהגיע אליו מהחברה, ולא להשתמש, לגלות, למסור, לצלם, להקליט, לשכפל, להעתיק או להעביר את המידע, בחלקו או במלואו, לאדם או גורם כלשהו, בתמורה או שלא בתמורה, ללא הסכמת החברה בכתב ומראש.</p>
 
                         <h4>10. מידע וסודות החברה</h4>
-                        <p>10.1 כל המידע הקשור במישרין או בעקיפין לחברה או לחברות קשורות אליה — לרבות מידע כלכלי, עסקי, פיננסי, מסחרי, סטטיסטי, שיווקי, נתוני שיווק ומכירות, שיטות ותהליכי עבודה, סודות מקצועיים, מידע שיווקי ופרסומי, נוהלי עבודה, דרכי התקשרות, רשימות לקוחות וספקים, מערך הנחות, מחקר ופיתוח, תוכנות, אבות טיפוס, טכנולוגיות, תוכניות עסקיות וכל מידע אחר — נחשבים לסודות מסחריים רבי ערך של החברה.<br>
+                        <p>10.1 כל המידע הקשור במישרין או בעקיפין לחברה או לחברות קשורות אליה, לרבות מידע כלכלי, עסקי, פיננסי, מסחרי, סטטיסטי, שיווקי, נתוני שיווק ומכירות, שיטות ותהליכי עבודה, סודות מקצועיים, מידע שיווקי ופרסומי, נוהלי עבודה, דרכי התקשרות, רשימות לקוחות וספקים, מערך הנחות, מחקר ופיתוח, תוכנות, אבות טיפוס, טכנולוגיות, תוכניות עסקיות וכל מידע אחר, נחשבים לסודות מסחריים רבי ערך של החברה.<br>
                         10.2 הקבלן מצהיר ומתחייב כי ינקוט בכל אמצעי הזהירות והצעדים הדרושים לשמירת המידע וסודות החברה ולמניעת העברתם לצד שלישי.<br>
                         10.3 מיד עם דרישת החברה, הקבלן מתחייב להחזיר לה כל מסמך וחומר שיימצא ברשותו או בשליטתו, וכן כל רכוש אחר שהגיע לרשותו מהחברה.<br>
                         10.4 הקבלן מאשר כי התחייבויותיו יחולו עליו ועל כל מי מטעמו, במישרין או בעקיפין, כשכיר, עצמאי, שותף, יועץ, מנהל, בעל מניות או בכל דרך אחרת.<br>
-                        10.5 לעניין הסכם זה, ״בעקיפין״ — לרבות כל תאגיד קשור, שלוב, או אדם שיש לקבלן קשר, שליטה או השפעה עליו בפועל או על פי דין.<br>
+                        10.5 לעניין הסכם זה, ״בעקיפין״, לרבות כל תאגיד קשור, שלוב, או אדם שיש לקבלן קשר, שליטה או השפעה עליו בפועל או על פי דין.<br>
                         10.6 הקבלן מצהיר כי האמור יחול גם על מידע שהגיע לרשותו בטרם החתימה על הסכם זה.<br>
                         10.7 מבלי לגרוע מההתחייבויות על פי כל דין, המדריך מתחייב לשמור בסודיות מוחלטת את תנאי העסקתו ושכרו במהלך ההתקשרות ולאחריה.</p>
 
@@ -267,9 +257,9 @@
                         12.4 כל ארכה, הנחה, ויתור או אי־נקיטת צעדים לא יהוו ויתור על זכויות הצדדים, אלא אם נעשו בכתב ונחתמו.<br>
                         12.5 על הסכם זה יחולו באופן בלעדי דיני מדינת ישראל, ללא כללי ברירת דין.<br>
                         12.6 הצדדים מסכימים כי כל חילוקי דעות בקשר להסכם זה יובאו להכרעתם של בתי המשפט במחוז תל־אביב יפו, להם תהיה סמכות השיפוט הבלעדית.<br>
-                        12.7 הודעה בדואר רשום תיחשב כאילו נתקבלה כעבור 3 ימים ממסירתה, או במסירה אישית — במועד מסירתה, או בפקסימיליה — ביום העסקים הראשון לאחר שיגורה.</p>
+                        12.7 הודעה בדואר רשום תיחשב כאילו נתקבלה כעבור 3 ימים ממסירתה, או במסירה אישית, במועד מסירתה, או בפקסימיליה, ביום העסקים הראשון לאחר שיגורה.</p>
 
-                        <h4>נספח א׳ — השירותים</h4>
+                        <h4>נספח א׳ - השירותים</h4>
                         <ul>
                             <li>אימוני כושר וולנס.</li>
                             <li>תכני ספורט וכושר להם הקבלן מוסמך.</li>
@@ -278,37 +268,53 @@
                             <li>השתתפות בצילומים ו/או בפעולות ייצוגיות של העסק.</li>
                         </ul>
 
-                        <h4>נספח ב׳ — התמורה</h4>
+                        <h4>נספח ב׳ - התמורה</h4>
                         <p>בכפוף למילוי התחייבויותיו של הקבלן במלואן ובמועדן, ובתמורה למתן השירותים המפורטים בנספח א׳, תשלם החברה לקבלן תמורה לפי שעה כדלקמן:</p>
                         <ul>
-                            <li><strong>200 ש״ח + מע״מ</strong> — בעבור העברת אימון בקומות VUCA / ART.</li>
-                            <li><strong>150 ש״ח + מע״מ</strong> — בעבור שעת הדרכה בקומת LIVO.</li>
-                            <li><strong>60 ש״ח + מע״מ</strong> — בעבור אירוח תרגול חופשי בקומת LIVO.</li>
+                            <li><strong>200 ש״ח + מע״מ</strong> בעבור העברת אימון בקומות VUCA / ART.</li>
+                            <li><strong>150 ש״ח + מע״מ</strong> בעבור שעת הדרכה בקומת LIVO.</li>
+                            <li><strong>60 ש״ח + מע״מ</strong> בעבור אירוח תרגול חופשי בקומת LIVO.</li>
                         </ul>
                         <p>התמורה בגין החודש הקלנדרי שחלף תשולם עד ליום ה־20 בכל חודש. הקבלן ימציא לחברה עד ליום ה־3 בכל חודש חשבונית מס בעבור שירותיו בגין החודש הקלנדרי שחלף.</p>
                         <p>מוסכם כי כל פרויקט או תפקיד נוסף שחורג משעות האימון המוגדרות יתומחר בנפרד ולשביעות רצון שני הצדדים. תנאי להתחלתו הינו חתימה על הצעת מחיר והסכם עבודה על ידי הצדדים.</p>
                     </div>
 
                     <p class="agreement-text">
-                        By signing below I confirm I have read and agreed to the <strong>De Club Teachers Agreement</strong> above — including Appendix A (Services) and Appendix B (Compensation). I certify the details in this form are accurate and authorise De Club to use my profile picture on its website and in Arbox.
+                        By signing below I confirm I have read and agreed to the <strong>De Club Teachers Agreement</strong> above, including Appendix A (Services) and Appendix B (Compensation). I certify the details in this form are accurate and authorise De Club to use my profile picture on its website and in Arbox.
                     </p>
-
-                    <div class="field">
-                        <label for="signature" class="label">Signature <span class="required">*</span><span class="hint">Type full name</span></label>
-                        <input type="text" id="signature" name="signature" class="signature-input" autocomplete="off" placeholder="Your full name" required>
-                    </div>
-
-                    <label class="checkbox-row">
-                        <input type="checkbox" name="agreement_accepted" value="yes" required>
-                        <span>I have read and agree to the De Club Teachers Agreement above.</span>
-                    </label>
                 </div>
+
+                <div class="field" data-field="signature">
+                    <label class="label">Signature <span class="required">*</span><span class="hint">Sign with mouse or finger</span></label>
+                    <div class="signature-pad-wrap" id="signature-pad-wrap">
+                        <canvas class="signature-pad" id="signature-pad" aria-label="Signature pad"></canvas>
+                        <span class="signature-placeholder" id="signature-placeholder">Sign here</span>
+                        <button type="button" class="signature-clear" id="signature-clear" aria-label="Clear signature">Clear</button>
+                    </div>
+                    <p class="field-error" id="signature-error" hidden>Please sign above before submitting.</p>
+                </div>
+
+                <!-- ============ SECTION 4 · Finishing Up ============ -->
+                <div class="section-header">
+                    <span class="section-eyebrow">04 · Finishing Up</span>
+                    <h2 class="section-title">Finishing Up</h2>
+                </div>
+
+                <div class="field">
+                    <label for="notes" class="label">Additional Notes <span class="hint">Optional</span></label>
+                    <textarea id="notes" name="notes" rows="4" placeholder="Anything we should know about you, your practice, or your schedule."></textarea>
+                </div>
+
+                <label class="checkbox-row">
+                    <input type="checkbox" name="agreement_accepted" value="yes" required>
+                    <span>I have read and agree to the De Club Teachers Agreement above.</span>
+                </label>
 
                 <button type="submit" class="submit-btn">
                     <span class="btn-label">Submit Onboarding</span>
                 </button>
 
-                <p class="form-footnote">Your details go straight to the De Club crew — welcome aboard.</p>
+                <p class="form-footnote">Your details go straight to the De Club crew. Welcome aboard.</p>
             </form>
 
             <div class="success-panel" hidden role="status" aria-live="polite">
