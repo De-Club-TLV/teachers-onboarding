@@ -1,33 +1,41 @@
 # Session Log
 
 ## Spend to date
-- Sessions: 1
-- Tokens (in / out / cache-read): 241 / 74,329 / 9,865,254
-- Cost: $30.8295
+- Sessions: 2
+- Tokens (in / out / cache-read): 626 / 147,154 / 19,601,407
+- Cost: $71.1148
 
 ---
 
-## 2026-04-22
+## 2026-04-23
 
-**Focus:** Scaffold the DeClub Teachers Onboarding project and ship a first-pass merged web form with embedded Hebrew contract.
+**Focus:** Form UX revision pass, signed-agreement PDF design to production quality, De Club Google Workspace MCP stood up end-to-end, Supabase De Club ops project created and scaffolded.
 
 **Done:**
-- Created public repo `De-Club-TLV/teachers-onboarding`. Scaffolded: `CLAUDE.md`, `README.md`, `.gitignore`, `.env.example`, `SESSION_LOG.md`, `.claude/` config + agents README. Initial commit pushed.
-- Pulled field specs from the two source Jotforms (`253331785543460` English onboarding + `260455438340455` Hebrew agreement) and extracted the full contract body — 12 clauses + Appendix A (Services) + Appendix B (Compensation: 200 / 150 / 60 ₪ + VAT).
-- Built form v1 in Hot Form's design language: `index.html`, `styles.css`, `script.js`, `netlify.toml`, copied DeClub brand assets. Four sections: Personal · Documents · Payment · Agreement.
-- Custom dark-themed UI for file upload (drag-and-drop + filename preview), radio pills (gender + עוסק מורשה/פטור), typed signature in sage italic, scrollable RTL Hebrew agreement card, "I agree" checkbox. Multipart POST to Netlify Forms (`teachers-onboarding`).
-- Verified locally at `http://localhost:4322`. Form files committed.
+- Implemented 10-point form redesign: subtitle removed, files hardened to JPG/PNG (profile) and PDF/JPG/PNG (certifications), Section 3 renamed Bank Account Details with Hebrew-only business type pills, bank/branch capped at 3 digits, title case across headings, Section 4 moved below agreement, em/en dashes stripped per new writing rule (applied globally), typed-name signature replaced by inline signatory box inside the Hebrew preamble, mandatory drawn signature canvas (mouse + touch + Clear), sage-green scrollbar on contract body.
+- Designed the signed agreement PDF through ~8 iterations to land on a 2-page A4 "editorial luxury" layout: all-black edge-to-edge via `@page margin:0` + per-page `.sheet` wrappers with internal padding; masthead with sage hairline; preamble with inline signatory; 12 numbered clauses (§ symbols dropped per Yuval); Appendix A + B with sage rule + mono tag; signature card anchored by four thin sage L-brackets; mock scripted signature; `Signed At` in `DD/MM/YYYY HH:mm`.
+- Promoted the PDF template into the repo at `pdf-template/agreement.html` with mustache placeholders (`{{full_name}}`, `{{id_number}}`, `{{signed_at}}`, `{{signature_data_url}}`).
+- Mocked the final flow end-to-end: rendered mock PDF via Chrome headless, sent from Dasha → Yuval via Gmail API + SA JWT (bypassed Gmail MCP's lack of attachment support), iterated on margins + scope of content based on feedback.
+- Stood up **De Club Google Workspace MCP**: created service account `declub-workspace-agent` in GCP project `instant-pivot-480317-f5`, granted info@declub.co.il org-level `orgpolicy.policyAdmin`, overrode `iam.disableServiceAccountKeyCreation` at project level via the v2 `set-policy` YAML (the shortcut `disable-enforce` wrote an empty policy that didn't take effect), generated + downloaded JSON key, registered Domain-Wide Delegation with 6 OAuth scopes, stored key at `~/.claude/.secrets/declub-sa.json` (chmod 600), verified Gmail / Calendar / Drive all return data as info@declub.co.il, wired `google-workspace-declub` MCP server to `~/.claude.json`. Fully live post-restart.
+- Created De Club Supabase organization + second project `General` (ref `ddympwajiickrhbjkidb`, Pro tier, Micro compute, London). Scaffolded `General/supabase/migrations/0001_init_teachers.sql` with the teachers schema (enums, unique constraints, updated_at trigger, RLS enabled). Migration file committed; apply-to-cloud deferred (Supabase MCP is `--read-only`).
+- Locked the architecture plan at `~/.claude/plans/i-want-to-store-cached-stardust.md`: Forms repo owns the form + PDF template, General repo owns Trigger.dev tasks + Supabase migrations, Drive for PDFs (folder `1gZSDGCkRhkNyDJdqp81TZGGu2StKK1CB`), Supabase Storage for images, Monday payroll board `5091420362` receives each new teacher as Active, Netlify Function as webhook ingress to Trigger.dev task.
+- Saved mapping for cwd `/Users/yuvalsmac/Knightica/Projects/Clients/De Club` → De Club board.
 
 **Decisions:**
-- Contract text embedded inline in `index.html` rather than loaded from a separate file — single artifact, versioned in git. Acceptable because legal revisions are rare.
-- Email is required (Jotform 1 had it optional, Jotform 2 had it required — merged to required since comms depend on it).
-- Typed signature only in v1; drawn-canvas signature deferred.
-- No Monday tasks created per Yuval's request.
+- No Dasha identity on the De Club side — De Club is a client, Dasha stays Knightica-only. MCP default impersonation is `info@declub.co.il`, not a dedicated agent account.
+- Supabase: **separate dedicated De Club ops project** (not merged into the existing Debluv app project). Teacher + payroll + future sales data is internal admin-scope with very different RLS / blast radius than a member-facing app. Both under the same Supabase org.
+- Trigger.dev for orchestration, not n8n — Playwright build extension handles headless Chrome PDF render cleanly and fits `General/` which is already a Trigger.dev v4 project.
+- Drive holds the signed PDFs (team browses there); Supabase Storage holds images (profile, certifications, signature PNG) referenced by path in the DB row. Monday payroll board is the notification surface, Supabase is source of truth.
+- Drawn signature in production replaces the mock scripted signature — data URL embedded directly in the PDF template rather than signed URL to avoid expiry races.
+- Teacher default status on insert = `pending_review` (easily reversed if ops would rather auto-activate).
 
 **Next:**
-- Deploy to Netlify + custom subdomain (e.g. `teachers.declub.co.il`).
-- Verify the embedded Hebrew contract text against the source-of-truth PDF with Yoni / legal before go-live.
-- Decide final gender options and whether to add a drawn-signature canvas.
-- Wire Netlify Forms submissions into the n8n → Monday/Trigger.dev pipeline, mirroring the Hot Form flow.
+- Apply Supabase migration 0001 to the General project (paste into Supabase Studio SQL editor, or flip the Supabase MCP off `--read-only` and re-apply via MCP). Requires Yuval.
+- Create Supabase Storage buckets: `teacher-profiles`, `teacher-certifications`, `teacher-signatures` (private, service-role only).
+- Yuval to paste the `SUPABASE_SERVICE_ROLE_KEY` into `General/.env` for the Trigger.dev task.
+- Build the Trigger.dev `teacher-intake` pipeline end-to-end in `General/`: `src/lib/{pdf,gmail,drive,supabase,teachers-payroll}.ts` + `src/trigger/teacher-intake.ts`, add Playwright build extension in `trigger.config.ts`, new env vars synced.
+- Build Netlify Function `submit.ts` in the form repo + sign the form payload with HMAC before POSTing to the function.
+- Deploy Teachers Onboarding form to Netlify, bind `teachers.declub.co.il` DNS.
+- Verify Hebrew contract text against the source PDF with Yoni / legal before go-live.
 
-**Spend:** $30.8295 this session · tokens in/out/cache-read: 241 / 74,329 / 9,865,254
+**Spend:** $40.2853 this session · tokens in/out/cache-read: 385 / 72,825 / 9,736,153
