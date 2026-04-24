@@ -7,6 +7,31 @@
 
 ---
 
+## 2026-04-24
+
+**Focus:** Stand up the teachers.declub.co.il site + Netlify Function ingress to the teacher-intake Trigger.dev task, fix field-value mismatches discovered during real-submission testing.
+
+**Done:**
+- Created Netlify site `teachers-onboarding` (id `4858e4f9-5885-4f52-a43d-0a5d3e62470a`) on team `de-club` via Netlify MCP. Yuval linked the GitHub repo in the UI.
+- Added `netlify/functions/submit.ts`: HMAC-verifies with `TEACHERS_HMAC_SECRET`, forwards the parsed JSON payload to `api.trigger.dev/api/v1/tasks/teacher-intake/trigger` with `submission_id` as idempotency key (24h TTL).
+- Removed Netlify Forms capture from `index.html` (`data-netlify` + `form-name` hidden). Rewrote the submit handler in `script.js` to read files as base64 data URLs, build JSON payload with canonicalized keys, HMAC-sign via Web Crypto, POST to the function.
+- Bound `teachers.declub.co.il` → `teachers-onboarding.netlify.app`. Added TXT `subdomain-owner-verification` verification record via DNS Made Easy (overwrote the prior hotform TXT value — hotform is already verified + SSL-issued). Added CNAME `teachers` → `teachers-onboarding.netlify.app.` with 60s TTL. Netlify issued SSL within minutes.
+- Set env vars on the site: `TEACHERS_HMAC_SECRET` (new 32-byte hex), `TRIGGER_PROD_SECRET_KEY`. Env vars didn't save on first MCP attempt with `envVarIsSecret: true`, worked on retry without that flag. Redeployed so the function picked them up at runtime.
+- Fixed two HTML mismatches discovered during Yuval's real-submission testing: radio `value=` attrs were display labels (`"Osek Murshe"` / `"Female"`) but the Zod schema on the server expects enum keys (`osek_murshe`, `female`). Updated the four radio values. Also widened `account_number` pattern from `[0-9]{4,12}` to `[0-9]+` — Israeli bank account numbers can exceed 12 digits.
+- Committed `c4fa88f` (function wiring) and `0c0d93a` (enum + pattern fixes). Pushed.
+
+**Decisions:**
+- Direct browser → Netlify Function → Trigger.dev path (skipping n8n). Same pattern we later applied to website + hot form. Function is ~30 lines of TS.
+- Payload ingress accepts base64 data URLs directly and the Trigger.dev task handles the Storage upload. Alternative (pre-upload in the function, pass paths) would keep the Trigger payload small but require a secondary Supabase client in the function — rejected, added complexity for our submission volume isn't worth it.
+- SSL verification retry: when Netlify first rejected the subdomain verification, lowering the DNS Made Easy TTL to 60s and re-clicking succeeded after propagation. The record value itself was correct from the start; the issue was Netlify's resolver caching the prior (hotform) value for ~5 minutes.
+
+**Next:**
+- Legal review of Hebrew contract text before the first real teacher signs it (Yuval to send PDF template to Yoni / lawyer).
+
+**Spend:** session spend logged in `General/SESSION_LOG.md` (cross-repo session).
+
+---
+
 ## 2026-04-23
 
 **Focus:** Form UX revision pass, signed-agreement PDF design to production quality, De Club Google Workspace MCP stood up end-to-end, Supabase De Club ops project created and scaffolded.
