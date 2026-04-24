@@ -298,6 +298,66 @@
 
     /* ---------- Submit ---------- */
 
+    // Shared HMAC secret between this client JS and the Netlify Function.
+    // Browser can see this; real anti-abuse lives at the edge (rate limits).
+    const HMAC_SECRET = '24ab36ae6ce6f3cd019f7d7d8e9d6b06acf4d397b073252bdc6e222e6957fb2c';
+    const SUBMIT_ENDPOINT = '/.netlify/functions/submit';
+
+    function readFileAsDataUrl(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function sortKeys(val) {
+        if (Array.isArray(val)) return val.map(sortKeys);
+        if (val && typeof val === 'object') {
+            const out = {};
+            for (const k of Object.keys(val).sort()) out[k] = sortKeys(val[k]);
+            return out;
+        }
+        return val;
+    }
+
+    function canonicalJson(obj) {
+        return JSON.stringify(sortKeys(obj));
+    }
+
+    async function hmacSha256Hex(secret, message) {
+        const enc = new TextEncoder();
+        const key = await crypto.subtle.importKey(
+            'raw',
+            enc.encode(secret),
+            { name: 'HMAC', hash: 'SHA-256' },
+            false,
+            ['sign']
+        );
+        const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message));
+        return Array.from(new Uint8Array(sig))
+            .map((b) => b.toString(16).padStart(2, '0'))
+            .join('');
+    }
+
+    function uuid() {
+        if (crypto.randomUUID) return crypto.randomUUID();
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+            const r = (Math.random() * 16) | 0;
+            const v = c === 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
+    function isoToDate(isoLike) {
+        // Accept YYYY-MM-DD and pass through; otherwise attempt Date parse.
+        if (/^\d{4}-\d{2}-\d{2}$/.test(isoLike)) return isoLike;
+        const d = new Date(isoLike);
+        if (Number.isNaN(d.getTime())) return isoLike;
+        return d.toISOString().slice(0, 10);
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -323,18 +383,66 @@
         submitBtn.disabled = true;
         btnLabel.textContent = 'Submitting…';
 
-        const formData = new FormData(form);
-        if (typeof iti.getNumber === 'function') {
-            formData.set('phone', iti.getNumber());
-        }
-        formData.set('phone_country', iti.getSelectedCountryData().iso2 || '');
-
         try {
-            const response = await fetch('/', {
+            const fd = new FormData(form);
+
+            // Files → base64 data URLs.
+            const profileFile = fd.get('profile_picture');
+            const certFiles = fd.getAll('certifications').filter((f) => f instanceof File && f.size > 0);
+
+            const profileDataUrl = profileFile instanceof File && profileFile.size > 0
+                ? await readFileAsDataUrl(profileFile)
+                : null;
+            const certDataUrls = await Promise.all(certFiles.map(readFileAsDataUrl));
+
+            const payload = {
+                submission_id: uuid(),
+                submitted_at: new Date().toISOString(),
+
+                first_name: (fd.get('first_name') || '').toString().trim(),
+                last_name: (fd.get('last_name') || '').toString().trim(),
+                email: (fd.get('email') || '').toString().trim(),
+                phone: typeof iti.getNumber === 'function' ? iti.getNumber() : (fd.get('phone') || '').toString(),
+                phone_country: (iti.getSelectedCountryData().iso2 || '').toLowerCase() || null,
+                id_number: (fd.get('id_number') || '').toString().trim(),
+                birthday: isoToDate((fd.get('birthday') || '').toString()),
+                gender: (fd.get('gender') || '').toString(),
+                instagram: (fd.get('instagram') || '').toString().trim() || null,
+
+                business_type: (fd.get('business_type') || '').toString(),
+                bank_number: (fd.get('bank_number') || '').toString(),
+                branch_number: (fd.get('branch_number') || '').toString(),
+                account_number: (fd.get('account_number') || '').toString().trim(),
+
+                notes: (fd.get('notes') || '').toString().trim() || null,
+
+                profile_picture: profileDataUrl,
+                certifications: certDataUrls,
+                signature_data_url: (fd.get('signature_image') || '').toString(),
+            };
+
+            // Strip null-ish keys we don't want to send (the server Zod schema
+            // treats optional fields as absent, not null).
+            for (const k of ['phone_country', 'instagram', 'notes', 'profile_picture']) {
+                if (payload[k] === null) delete payload[k];
+            }
+
+            const canonical = canonicalJson(payload);
+            const signature = await hmacSha256Hex(HMAC_SECRET, canonical);
+
+            const response = await fetch(SUBMIT_ENDPOINT, {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Webhook-Signature': signature,
+                },
+                body: canonical,
             });
-            if (!response.ok) throw new Error('Submission failed');
+
+            if (!response.ok) {
+                const text = await response.text().catch(() => '');
+                throw new Error('Submission failed: ' + response.status + ' ' + text.slice(0, 200));
+            }
 
             formSection.classList.add('submitted');
             successPanel.hidden = false;
