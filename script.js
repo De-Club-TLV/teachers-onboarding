@@ -300,7 +300,7 @@
 
     // Shared HMAC secret between this client JS and the Netlify Function.
     // Browser can see this; real anti-abuse lives at the edge (rate limits).
-    const HMAC_SECRET = '24ab36ae6ce6f3cd019f7d7d8e9d6b06acf4d397b073252bdc6e222e6957fb2c';
+    const HMAC_SECRET = '40a0564a1fde1964ceacd4dc0ff2e87a251a87a0380b549b0735e997b526c766';
     const SUBMIT_ENDPOINT = '/.netlify/functions/submit';
 
     function readFileAsDataUrl(file) {
