@@ -26,4 +26,4 @@ A single-page web form for **DeClub** to onboard new teachers — collects their
 - Any form-field change: update `index.html` AND the corresponding field set; Netlify auto-detects new fields on next deploy
 
 ## Agents Policy
-Project-specific agents live in `.claude/agents/`. **New agents require Yuval's approval.** Only create one when the task genuinely needs something Dasha's general agents don't cover.
+Project-specific agents live in `.claude/agents/`. **New agents require Yuval's approval.** Only create one when the task genuinely needs something Claude's general agents don't cover.

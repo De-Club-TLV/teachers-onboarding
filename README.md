@@ -33,7 +33,7 @@ Pushing to `main` triggers a Netlify build and deploy automatically (once the re
 .
 ├── index.html         # the form page
 ├── .claude/           # Claude Code config and agents
-├── CLAUDE.md          # project instructions for Dasha
+├── CLAUDE.md          # project instructions for Claude
 ├── SESSION_LOG.md     # work session log
 ├── .env.example       # environment variable template
 └── README.md
