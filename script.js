@@ -28,6 +28,44 @@
     const submitBtn = form.querySelector('.submit-btn');
     const btnLabel = submitBtn.querySelector('.btn-label');
 
+    /* ---------- Single-use agreement links ---------- */
+
+    // teachers.declub.co.il/<slug> serves this same form with a custom
+    // agreement. The link dies on first submit (Supabase onboarding_links,
+    // claimed in the submit function). Keep these strings identical to
+    // General/src/modules/teacher-intake/variants.ts, which renders the PDF.
+    const VARIANTS = {
+        hagai: {
+            clause61: 'הקבלן יהיה אחראי לנזק ישיר או עקיף שנגרם עקב מעשה או מחדל שלו במסגרת השירותים. הקבלן לא יהיה אחראי לנזק הנובע מליקוי במבנה, במתקנים או בציוד, מתחזוקה לקויה, מהיעדר רישוי או ביטוח, ממעשה של מתאמן שלא היה תחת הדרכתו הישירה או מכל עניין המצוי בשליטת החברה. החברה תהיה אחראית לתקינות ולבטיחות המתחם והציוד ומחזיקה בביטוח צד שלישי המכסה את פעילות המתחם ואת הקבלן בעת פעילותו מטעמה.',
+            clause64: 'הקבלן מתחייב לבטח את השירותים כנדרש בהתאם להוראות הדין, ובכלל זה מתחייב כי בעת מתן השירותים יהיה מבוטח בביטוח אחריות מקצועית של לפחות מיליון ש״ח.',
+            appendixA: 'באירוח תרגול חופשי ("free flow") תפקיד הקבלן הינו נוכחות, פיקוח בטיחותי בסיסי ומתן מענה ראשוני במקרה חירום. אין בכך כדי להטיל עליו אחריות לתחזוקת המתחם או הציוד, לתקינותם או לפעילות עצמאית של מתאמנים שאינם מקבלים ממנו הדרכה אישית.',
+        },
+    };
+
+    const slug = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    const variant = Object.prototype.hasOwnProperty.call(VARIANTS, slug) ? slug : null;
+
+    function showLinkUsed() {
+        formSection.classList.add('submitted');
+        successPanel.querySelector('.success-title').textContent = 'This link has been used.';
+        successPanel.querySelector('.success-body').textContent = 'Reach out to the De Club crew if you need a new one.';
+        successPanel.hidden = false;
+    }
+
+    if (variant) {
+        const v = VARIANTS[variant];
+        document.getElementById('clause-6-1').textContent = v.clause61;
+        document.getElementById('clause-6-4').textContent = v.clause64;
+        const extra = document.getElementById('appendix-a-extra');
+        extra.textContent = v.appendixA;
+        extra.hidden = false;
+
+        fetch('/.netlify/functions/link-status?slug=' + encodeURIComponent(variant))
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => { if (d && d.open === false) showLinkUsed(); })
+            .catch(() => {});
+    }
+
     /* ---------- intl-tel-input ---------- */
 
     const iti = window.intlTelInput(phoneInput, {
@@ -421,6 +459,8 @@
                 signature_data_url: (fd.get('signature_image') || '').toString(),
             };
 
+            if (variant) payload.variant = variant;
+
             // Strip null-ish keys we don't want to send (the server Zod schema
             // treats optional fields as absent, not null).
             for (const k of ['phone_country', 'instagram', 'notes', 'profile_picture']) {
@@ -438,6 +478,12 @@
                 },
                 body: canonical,
             });
+
+            if (response.status === 410) {
+                showLinkUsed();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
 
             if (!response.ok) {
                 const text = await response.text().catch(() => '');

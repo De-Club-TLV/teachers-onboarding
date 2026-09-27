@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { claim, release } from "./_links";
 
 // Netlify Function: receive a teacher onboarding submission (JSON body with
 // base64 data URLs for files), HMAC-verify, and forward to the Trigger.dev
@@ -93,20 +94,42 @@ export async function handler(event: NetlifyEvent): Promise<NetlifyResponse> {
   // from flaky browsers don't create duplicate teacher records.
   const submissionId = typeof payload.submission_id === "string" ? payload.submission_id : null;
 
-  const res = await fetch(TRIGGER_API, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${triggerKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      payload,
-      options: submissionId ? { idempotencyKey: submissionId, idempotencyKeyTTL: "24h" } : undefined,
-    }),
-  });
+  // Single-use link (/hagai etc.): claim it before forwarding. A used link
+  // answers 410 and the form shows "this link has been used".
+  const variant = typeof payload.variant === "string" ? payload.variant : null;
+  if (variant) {
+    if (!submissionId) return json(400, { error: "missing submission_id" });
+    let claimed: boolean;
+    try {
+      claimed = await claim(variant, submissionId);
+    } catch {
+      return json(503, { error: "link check unavailable" });
+    }
+    if (!claimed) return json(410, { error: "link already used" });
+  }
+
+  let res: Response;
+  try {
+    res = await fetch(TRIGGER_API, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${triggerKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        payload,
+        options: submissionId ? { idempotencyKey: submissionId, idempotencyKeyTTL: "24h" } : undefined,
+      }),
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch (err) {
+    if (variant && submissionId) await release(variant, submissionId).catch(() => {});
+    return json(502, { error: "trigger.dev unreachable", detail: (err as Error).message });
+  }
 
   if (!res.ok) {
     const text = await res.text();
+    if (variant && submissionId) await release(variant, submissionId).catch(() => {});
     return json(502, { error: "trigger.dev rejected", status: res.status, detail: text.slice(0, 500) });
   }
 
