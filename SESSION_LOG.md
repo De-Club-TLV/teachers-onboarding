@@ -64,3 +64,18 @@
 - Verify Hebrew contract text against the source PDF with Yoni / legal before go-live.
 
 **Spend:** $40.2853 this session · tokens in/out/cache-read: 385 / 72,825 / 9,736,153
+
+## 2026-09-27
+
+**Host:** macbook
+**Focus:** Single-use /hagai link with Hagai's amended agreement.
+
+**Done:**
+- /hagai serves the same form with Rachel's amended 6.1, 6.4 and Appendix A; `link-status` function + `submit.ts` claim on `onboarding_links` (410 when used, release on Trigger failure, 20 s timeout). Tested claim / double-claim / release and the headless render.
+- Netlify env SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY added. Site is NOT git-connected: deployed with netlify-cli + Keychain token.
+- Committed the pending Dasha -> Claude doc renames.
+
+**Next:**
+- Confirm the link shows "This link has been used" after Hagai submits.
+
+**Tokens:** shared session with De Club, see ../../SESSION_LOG.md
