@@ -79,3 +79,17 @@
 - Confirm the link shows "This link has been used" after Hagai submits.
 
 **Tokens:** shared session with De Club, see ../../SESSION_LOG.md
+
+
+## 2026-10-04
+
+**Host:** macbook
+**Focus:** Silent submission failures on large uploads.
+
+**Done:**
+- Root cause: base64 files in one JSON body; Netlify rejects >6 MB (413) and Trigger.dev rejects ~3 MB, page only flashed "Try again". Fix: canvas compression of photos, 2.8M-char cap with a clear message, visible errors, new `report-failure` function posting to De Club Alerts (TELEGRAM_* env added to the site). CLI-deployed.
+
+**Next:**
+- Real phone-upload test still pending (Chrome extension was offline).
+
+**Tokens:** shared session with De Club root, see ../../SESSION_LOG.md
