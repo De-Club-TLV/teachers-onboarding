@@ -953,3 +953,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         transition-duration: 0.01ms !important;
     }
 }
+
+.submit-error {
+    margin-top: 14px;
+    color: #ff8a80;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}

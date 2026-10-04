@@ -340,6 +340,59 @@
     // Browser can see this; real anti-abuse lives at the edge (rate limits).
     const HMAC_SECRET = '40a0564a1fde1964ceacd4dc0ff2e87a251a87a0380b549b0735e997b526c766';
     const SUBMIT_ENDPOINT = '/.netlify/functions/submit';
+    const FAILURE_ENDPOINT = '/.netlify/functions/report-failure';
+    // Netlify rejects request bodies over 6 MB and Trigger.dev payloads over
+    // ~3 MB, before our code runs. Base64 adds a third, so photos are shrunk
+    // in the browser and the total is checked before sending.
+    const MAX_BODY_CHARS = 2_800_000;
+    const submitError = form.querySelector('.submit-error');
+
+    function showSubmitError(msg) {
+        if (!submitError) return;
+        submitError.textContent = msg;
+        submitError.hidden = false;
+    }
+
+    // Tell the crew a submission did not go through (fire and forget).
+    function reportFailure(info) {
+        try {
+            fetch(FAILURE_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(info),
+                keepalive: true,
+            }).catch(() => {});
+        } catch (_) { /* never block the form */ }
+    }
+
+    // Downscale a JPEG/PNG photo to a JPEG data URL. Falls back to the
+    // original file when the browser cannot decode it.
+    async function compressImage(file, maxDim, quality) {
+        try {
+            const url = URL.createObjectURL(file);
+            const img = await new Promise((resolve, reject) => {
+                const i = new Image();
+                i.onload = () => resolve(i);
+                i.onerror = reject;
+                i.src = url;
+            });
+            const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.naturalWidth * scale);
+            canvas.height = Math.round(img.naturalHeight * scale);
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            URL.revokeObjectURL(url);
+            const out = canvas.toDataURL('image/jpeg', quality);
+            return out.length > 100 ? out : readFileAsDataUrl(file);
+        } catch (_) {
+            return readFileAsDataUrl(file);
+        }
+    }
+
+    const isImage = (f) => /^image\/(jpeg|png)$/.test(f.type);
 
     function readFileAsDataUrl(file) {
         return new Promise((resolve, reject) => {
@@ -429,9 +482,11 @@
             const certFiles = fd.getAll('certifications').filter((f) => f instanceof File && f.size > 0);
 
             const profileDataUrl = profileFile instanceof File && profileFile.size > 0
-                ? await readFileAsDataUrl(profileFile)
+                ? await compressImage(profileFile, 1200, 0.82)
                 : null;
-            const certDataUrls = await Promise.all(certFiles.map(readFileAsDataUrl));
+            const certDataUrls = await Promise.all(
+                certFiles.map((f) => (isImage(f) ? compressImage(f, 2000, 0.82) : readFileAsDataUrl(f)))
+            );
 
             const payload = {
                 submission_id: uuid(),
@@ -468,6 +523,22 @@
             }
 
             const canonical = canonicalJson(payload);
+            const who = {
+                first_name: payload.first_name,
+                last_name: payload.last_name,
+                phone: payload.phone,
+                email: payload.email,
+                variant: variant || null,
+                submission_id: payload.submission_id,
+                size_mb: Math.round((canonical.length / 1048576) * 10) / 10,
+            };
+
+            if (canonical.length > MAX_BODY_CHARS) {
+                reportFailure({ ...who, reason: 'too_large' });
+                const err = new Error('too_large');
+                err.userMessage = 'Your files are too large (' + who.size_mb + ' MB). Please upload smaller certificate files (a photo or a compressed PDF, under 2 MB in total) and submit again.';
+                throw err;
+            }
             const signature = await hmacSha256Hex(HMAC_SECRET, canonical);
 
             const response = await fetch(SUBMIT_ENDPOINT, {
@@ -487,14 +558,23 @@
 
             if (!response.ok) {
                 const text = await response.text().catch(() => '');
-                throw new Error('Submission failed: ' + response.status + ' ' + text.slice(0, 200));
+                reportFailure({ ...who, reason: 'http_' + response.status, detail: text.slice(0, 300) });
+                const err = new Error('Submission failed: ' + response.status + ' ' + text.slice(0, 200));
+                err.userMessage = response.status === 413
+                    ? 'Your files are too large. Please upload smaller certificate files and submit again.'
+                    : 'Something went wrong and your form was NOT received (error ' + response.status + '). Please try again in a minute, or send your details to the De Club crew on WhatsApp.';
+                throw err;
             }
+
+            if (submitError) submitError.hidden = true;
 
             formSection.classList.add('submitted');
             successPanel.hidden = false;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
             console.error(err);
+            if (!err.userMessage) reportFailure({ reason: 'network', detail: String(err && err.message || err).slice(0, 300) });
+            showSubmitError(err.userMessage || 'Your form was NOT received: the connection failed. Please check your internet and submit again.');
             btnLabel.textContent = 'Try again';
             submitBtn.disabled = false;
             setTimeout(() => {
